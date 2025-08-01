@@ -1,6 +1,6 @@
 # 🛠️ Configuration File Generator for Autograder
 
-This is a **Streamlit tool** designed to help generate `config.py` files for weekly auto grader tasks. Currently the features include
+This is a **Streamlit tool** developed to help generate `config.py` files for weekly auto grader tasks. Currently the features include
 
 - Define expected DataFrame variables
 
