@@ -1,6 +1,6 @@
 # 🛠️ Configuration File Generator for Autograder
 
-⚠️ **This tool is still under development.**
+⚠️ **This is still under development.**
 
 This is a Streamlit-based tool developed to help generate `config.py` files for weekly auto grading tasks. It provides a simple interface to
 
