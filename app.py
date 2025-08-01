@@ -11,7 +11,7 @@ st.markdown(
     and columns to display tyepes.
     </div>
     """,
-    unsafe_allow_html=True,
+    unsafe_allow_html = True,
 )
 
 # --- Sidebar: Configuration Inputs ---
