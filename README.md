@@ -8,6 +8,6 @@ This is a **Streamlit tool** designed to help generate `config.py` files for wee
 
 - Select columns whose types should be displayed in the autograder output
 
-- Preview the generated configuration and download it as `config.py` for integration with the grading pipeline.
+- Preview the generated configuration and download it as `config.py` for integration with the auto grading pipeline.
 
 ---
