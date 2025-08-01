@@ -21,7 +21,7 @@ if st.sidebar.button("🔁 Reset Form"):
     st.experimental_rerun()
 
 num_dfs = st.sidebar.number_input(
-    "🔢 Number of DataFrames to configure (Max = 10)",
+    "🔢 Number of DataFrames to configure",
     min_value = 1, max_value = 10,
     value = 1, step = 1,
     key = "num_dfs"
