@@ -2,7 +2,7 @@ import streamlit as st
 import io
 
 st.set_page_config(page_title="Config.py Generator", layout="wide")
-st.title("Config.py Generator")
+st.title("🛠️ Config.py Generator")
 
 st.markdown(
     """
@@ -18,17 +18,15 @@ st.markdown(
 st.sidebar.header("Configuration Settings")
 
 if st.sidebar.button("🔁 Reset Form"):
-    # Clear session state keys we manage
     for k in list(st.session_state.keys()):
-        if k.startswith(("name", "columns_", "showtypes_", "unique_checks", "num_dfs")):
+        if k.startswith(("name", "columns_", "showtypes_", "unique_enable_", "unique_cols_", "num_dfs")):
             del st.session_state[k]
     st.rerun()
 
 num_dfs = st.sidebar.number_input(
-    "Number of DataFrames to configure",
+    "🔢 Number of DataFrames to configure",
     min_value=1, max_value=10,
-    value=1, step=1,
-    key="num_dfs"
+    value=1, step=1, key="num_dfs"
 )
 
 defaults = {
@@ -38,7 +36,7 @@ defaults = {
 
 configs = []
 for i in range(num_dfs):
-    with st.sidebar.expander(f"DataFrame {i+1}", expanded=True):
+    with st.sidebar.expander(f"📑 DataFrame {i+1}", expanded=True):
         name = st.text_input(f"Name of DataFrame {i+1}", value=f"df{i+1}", key=f"name{i}")
         default_columns = defaults.get(name, {}).get("columns", "")
         default_show_types = defaults.get(name, {}).get("show_types", "")
@@ -51,32 +49,26 @@ for i in range(num_dfs):
             f"Columns to show types in `{name}` (comma-separated)",
             value=default_show_types, key=f"showtypes_{i}"
         )
+
+        # NEW: per-DF unique checks (sidebar)
+        st.checkbox("Add unique checks for this DataFrame", value=False, key=f"unique_enable_{i}")
+        st.text_input("Columns for unique values (comma-separated)", value="", key=f"unique_cols_{i}")
+
         configs.append({
             "name": name,
-            "columns": [col.strip() for col in columns.split(",") if col.strip()],
-            "show_types": [col.strip() for col in show_types.split(",") if col.strip()]
+            "columns": [c.strip() for c in columns.split(",") if c.strip()],
+            "show_types": [c.strip() for c in show_types.split(",") if c.strip()]
         })
 
-# --- UNIQUE_CHECKS section ---
-st.markdown("---")
-st.subheader("🔎 UNIQUE_CHECKS")
-
-if "unique_checks" not in st.session_state:
-    st.session_state.unique_checks = []
-
-c1, c2, c3, c4 = st.columns([2, 2, 1, 1])
-df_var = c1.text_input("DataFrame variable name", value="df1")
-col_name = c2.text_input("Column name", value="region")
-
-if c3.button("➕ Add"):
-    if df_var and col_name:
-        st.session_state.unique_checks.append({"df_var": df_var, "column": col_name})
-
-if c4.button("🧹 Clear all"):
-    st.session_state.unique_checks = []
-
-if st.session_state.unique_checks:
-    st.write(st.session_state.unique_checks)
+# Build UNIQUE_CHECKS from sidebar inputs
+unique_checks = []
+for i in range(num_dfs):
+    if st.session_state.get(f"unique_enable_{i}", False):
+        df_name = st.session_state.get(f"name{i}", f"df{i+1}")
+        cols_raw = st.session_state.get(f"unique_cols_{i}", "")
+        cols = [c.strip() for c in cols_raw.split(",") if c.strip()]
+        for c in cols:
+            unique_checks.append({"df_var": df_name, "column": c})
 
 # --- Main panel: Display result and download ---
 st.markdown("---")
@@ -85,7 +77,6 @@ st.subheader("📝 Preview")
 expected_vars = [cfg["name"] for cfg in configs]
 expected_columns = {cfg["name"]: cfg["columns"] for cfg in configs}
 show_types = {cfg["name"]: cfg["show_types"] for cfg in configs}
-unique_checks = st.session_state.unique_checks
 
 config_code = f"""
 # Auto-generated config.py
@@ -103,8 +94,6 @@ st.code(config_code, language="python")
 
 if st.button("✅ Generate config.py"):
     st.success("config.py generated successfully!")
-
-    # Create a download button with the content
     config_bytes = io.BytesIO(config_code.encode("utf-8"))
     st.download_button(
         label="📥 Download config.py",
